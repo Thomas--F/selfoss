@@ -217,6 +217,7 @@ class Database {
                                 OLD.starred IS DISTINCT FROM NEW.starred
                             )
                             EXECUTE PROCEDURE update_updatetime_procedure();',
+                        'ALTER TABLE sources ADD waitperiod INT NOT NULL DEFAULT 0;',
                         'INSERT INTO version (version) VALUES (11);'
                     ]);
                 }

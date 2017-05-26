@@ -230,6 +230,7 @@ class Database {
                                     SET updatetime = CURRENT_TIMESTAMP
                                     WHERE id = NEW.id;
                                 END',
+                        'ALTER TABLE `' . \F3::get('db_prefix') . 'sources` ADD waitperiod INT NOT NULL DEFAULT 0;',
                         'INSERT INTO version (version) VALUES (11)'
                     ]);
                 }

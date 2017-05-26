@@ -20,17 +20,19 @@ class Sources extends Database {
      *
      * @return int new id
      */
-    public function add($title, $tags, $filter, $spout, $params) {
+    public function add($title, $tags, $filter, $waitperiod, $spout, $params) {
         // sanitize tag list
         $tags = implode(',', preg_split('/\s*,\s*/', trim($tags), -1, PREG_SPLIT_NO_EMPTY));
 
-        return $this->stmt->insert('INSERT INTO ' . \F3::get('db_prefix') . 'sources (title, tags, filter, spout, params) VALUES (:title, :tags, :filter, :spout, :params)', [
-            ':title' => trim($title),
-            ':tags' => $tags,
-            ':filter' => $filter,
-            ':spout' => $spout,
-            ':params' => htmlentities(json_encode($params))
-        ]);
+        return $this->stmt->insert('INSERT INTO '.\F3::get('db_prefix').'sources (title, tags, filter, waitperiod, spout, params) VALUES (:title, :tags, :filter, :waitperiod, :spout, :params)',
+                    array(
+                        ':title'  => trim($title),
+                        ':tags'   => $tags,
+                        ':filter' => $filter,
+                        ':waitperiod'  => $waitperiod,
+                        ':spout'  => $spout,
+                        ':params' => htmlentities(json_encode($params))
+                    ));
     }
 
     /**
@@ -44,18 +46,20 @@ class Sources extends Database {
      *
      * @return void
      */
-    public function edit($id, $title, $tags, $filter, $spout, $params) {
+    public function edit($id, $title, $tags, $filter, $waitperiod, $spout, $params) {
         // sanitize tag list
         $tags = implode(',', preg_split('/\s*,\s*/', trim($tags), -1, PREG_SPLIT_NO_EMPTY));
 
-        \F3::get('db')->exec('UPDATE ' . \F3::get('db_prefix') . 'sources SET title=:title, tags=:tags, filter=:filter, spout=:spout, params=:params WHERE id=:id', [
-            ':title' => trim($title),
-            ':tags' => $tags,
-            ':filter' => $filter,
-            ':spout' => $spout,
-            ':params' => htmlentities(json_encode($params)),
-            ':id' => $id
-        ]);
+        \F3::get('db')->exec('UPDATE '.\F3::get('db_prefix').'sources SET title=:title, tags=:tags, filter=:filter, waitperiod=:waitperiod, spout=:spout, params=:params WHERE id=:id',
+                    array(
+                        ':title'  => trim($title),
+                        ':tags'   => $tags,
+                        ':filter' => $filter,
+                        ':waitperiod'  => $waitperiod,
+                        ':spout'  => $spout,
+                        ':params' => htmlentities(json_encode($params)),
+                        ':id'     => $id
+                    ));
     }
 
     /**
@@ -127,7 +131,7 @@ class Sources extends Database {
      * @return mixed all sources
      */
     public function getByLastUpdate() {
-        $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error, lastupdate, lastentry FROM ' . \F3::get('db_prefix') . 'sources ORDER BY lastupdate ASC');
+        $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error, lastupdate, lastentry, waitperiod FROM '.\F3::get('db_prefix').'sources ORDER BY lastupdate ASC');
 
         return $ret;
     }
@@ -143,14 +147,15 @@ class Sources extends Database {
     public function get($id = null) {
         // select source by id if specified or return all sources
         if (isset($id)) {
-            $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error FROM ' . \F3::get('db_prefix') . 'sources WHERE id=:id', [':id' => $id]);
+            $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error, waitperiod FROM '.\F3::get('db_prefix').'sources WHERE id=:id',
+                                    array(':id' => $id));
             if (isset($ret[0])) {
                 $ret = $ret[0];
             } else {
                 $ret = false;
             }
-        } else {
-            $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error FROM ' . \F3::get('db_prefix') . 'sources ORDER BY error DESC, lower(title) ASC');
+        } else { 
+            $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error, waitperiod FROM '.\F3::get('db_prefix').'sources ORDER BY error DESC, lower(title) ASC');
         }
 
         return $ret;
@@ -179,9 +184,9 @@ class Sources extends Database {
     public function getWithIcon() {
         $ret = \F3::get('db')->exec('SELECT
                 sources.id, sources.title, sources.tags, sources.spout,
-                sources.params, sources.filter, sources.error, sources.lastentry,
-                sourceicons.icon AS icon
-            FROM ' . \F3::get('db_prefix') . 'sources AS sources
+                sources.params, sources.filter, sources.error, sources.lastentry, 
+                sourceicons.icon AS icon, sources.waitperiod
+            FROM '.\F3::get('db_prefix').'sources AS sources
             LEFT OUTER JOIN
                 (SELECT items.source, icon
                  FROM ' . \F3::get('db_prefix') . 'items AS items,
