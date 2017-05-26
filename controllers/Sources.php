@@ -197,7 +197,7 @@ class Sources extends BaseController {
             $id = $sourcesDao->add($title, $tags, $filter, $waitperiod, $spout, $data);
         else
             $sourcesDao->edit($id, $title, $tags, $filter, $waitperiod, $spout, $data);
-
+        
         // autocolor tags
         $tagsDao = new \daos\Tags();
         $tags = explode(',', $tags);

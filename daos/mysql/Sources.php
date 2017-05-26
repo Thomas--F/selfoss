@@ -132,7 +132,6 @@ class Sources extends Database {
      */
     public function getByLastUpdate() {
         $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, filter, error, lastupdate, lastentry, waitperiod FROM '.\F3::get('db_prefix').'sources ORDER BY lastupdate ASC');
-
         return $ret;
     }
 
